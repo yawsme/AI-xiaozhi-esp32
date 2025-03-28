@@ -1,0 +1,36 @@
+# .github/workflows/build-upload.yml
+name: Build and Upload Firmware
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Build Firmware using Docker
+        run: |
+          docker build -f .firmware/Dockerfile -t firmware-builder .
+          # 运行容器，并将构建产物复制出来
+          CONTAINER_ID=$(docker create firmware-builder)
+          docker cp ${CONTAINER_ID}:/workspace/build ./build
+          docker rm ${CONTAINER_ID}
+
+      - name: Upload Firmware Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: firmware
+          path: build/*.bin
+
+      # 可选：将固件上传到第三方云存储，比如 Cloudflare R2
+      - name: Upload to Cloudflare R2
+        if: success()
+        run: |
+          curl -X PUT "https://your-r2-bucket-url/firmware.bin" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            --data-binary "@build/firmware.bin"
