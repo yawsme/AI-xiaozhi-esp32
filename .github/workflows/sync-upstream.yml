@@ -1,0 +1,21 @@
+# .github/workflows/sync-upstream.yml
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # 每天凌晨2点同步
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 需要完整的 commit 历史
+
+      - name: Run Upstream Sync Script
+        run: |
+          chmod +x .owkor/sync_upstream.sh
+          ./.owkor/sync_upstream.sh
