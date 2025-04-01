@@ -6,6 +6,9 @@ on:
     - cron: "0 2 * * *"  # 每天凌晨2点同步
   workflow_dispatch:
 
+permissions:
+  contents: write  # 关键：赋予写入权限
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -20,14 +23,13 @@ jobs:
       #     git config --global user.name "GitHub Actions"
       #     git config --global user.email "github-actions@github.com"
 
-      # - name: Add upstream and fetch
-      #   run: |
-      #     git remote add upstream https://github.com/78/xiaozhi-esp32.git
-      #     git fetch upstream
+      - name: Add upstream and fetch
+        run: |
+          git remote add upstream https://github.com/78/xiaozhi-esp32.git
+          git fetch upstream
   
       - name: Merge upstream changes
         run: |
-          git fetch upstream
           git checkout main
           git merge upstream/main --allow-unrelated-histories
           git push origin main  # 关键：推送回仓库
