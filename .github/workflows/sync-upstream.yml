@@ -10,6 +10,11 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
