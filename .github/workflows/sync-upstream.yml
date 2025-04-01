@@ -18,10 +18,10 @@ jobs:
         with:
           fetch-depth: 0  # 需要完整的 commit 历史
 
-      # - name: Set up Git user
-      #   run: |
-      #     git config --global user.name "GitHub Actions"
-      #     git config --global user.email "github-actions@github.com"
+      - name: Set up Git user
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
 
       - name: Add upstream and fetch
         run: |
