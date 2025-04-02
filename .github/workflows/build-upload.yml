@@ -3,34 +3,195 @@ name: Build and Upload Firmware
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+    inputs:
+      CONFIG_OTA_VERSION_URL:
+        description: 'The application will access this URL to check for updates.'
+        required: false
+        default: 'https://api.tenclass.net/xiaozhi/ota/'
+        type: string
+      CONFIG_LANGUAGE:
+        description: 'Select device display language.'
+        required: false
+        default: LANGUAGE_ZH_CN
+        type: choice
+        options: 
+          - LANGUAGE_ZH_CN
+          - LANGUAGE_ZH_TW
+          - LANGUAGE_EN_US
+          - LANGUAGE_JA_JP
+      CONFIG_CONNECTION_TYPE:
+        description: 'Connection Type.'
+        required: false
+        default: CONNECTION_TYPE_MQTT_UDP
+        type: choice
+        options: 
+          - CONNECTION_TYPE_MQTT_UDP
+          - CONNECTION_TYPE_WEBSOCKET
+      CONFIG_WEBSOCKET_URL:
+        description: 'Communication with the server through websocket after wake up. CONNECTION_TYPE_WEBSOCKET'
+        required: false
+        default: 'wss://api.tenclass.net/xiaozhi/v1/'
+        type: string
+      CONFIG_WEBSOCKET_ACCESS_TOKEN:
+        description: 'Access token for websocket communication. CONNECTION_TYPE_WEBSOCKET'
+        required: false
+        default: 'test-token'
+        type: string
+      CONFIG_BOARD_TYPE:
+        description: 'Board type.'
+        required: false
+        default: BOARD_TYPE_BREAD_COMPACT_WIFI
+        type: choice
+        options: 
+          - BOARD_TYPE_BREAD_COMPACT_WIFI
+          - BOARD_TYPE_BREAD_COMPACT_WIFI_LCD
+          - BOARD_TYPE_BREAD_COMPACT_ML307
+          - BOARD_TYPE_BREAD_COMPACT_ESP32
+          - BOARD_TYPE_BREAD_COMPACT_ESP32_LCD
+          - BOARD_TYPE_ESP32_CGC
+          - BOARD_TYPE_ESP_BOX_3
+          - BOARD_TYPE_ESP_BOX
+          - BOARD_TYPE_ESP_BOX_LITE
+          - BOARD_TYPE_KEVIN_BOX_1
+          - BOARD_TYPE_KEVIN_BOX_2
+          - BOARD_TYPE_KEVIN_C3
+          - BOARD_TYPE_KEVIN_SP_V3_DEV
+          - BOARD_TYPE_KEVIN_SP_V4_DEV
+          - BOARD_TYPE_KEVIN_YUYING_313LCD
+          - BOARD_TYPE_LICHUANG_DEV
+          - BOARD_TYPE_LICHUANG_C3_DEV
+          - BOARD_TYPE_DF_K10
+          - BOARD_TYPE_MAGICLICK_2P4
+          - BOARD_TYPE_MAGICLICK_2P5
+          - BOARD_TYPE_MAGICLICK_C3
+          - BOARD_TYPE_MAGICLICK_C3_V2
+          - BOARD_TYPE_M5STACK_CORE_S3
+          - BOARD_TYPE_ATOMS3_ECHO_BASE
+          - BOARD_TYPE_ATOMS3R_ECHO_BASE
+          - BOARD_TYPE_ATOMS3R_CAM_M12_ECHO_BASE
+          - BOARD_TYPE_ATOMMATRIX_ECHO_BASE
+          - BOARD_TYPE_XMINI_C3
+          - BOARD_TYPE_ESP32S3_KORVO2_V3
+          - BOARD_TYPE_ESP_SPARKBOT
+          - BOARD_TYPE_ESP32S3_Touch_AMOLED_1_8
+          - BOARD_TYPE_ESP32S3_Touch_LCD_1_85C
+          - BOARD_TYPE_ESP32S3_Touch_LCD_1_85
+          - BOARD_TYPE_ESP32S3_Touch_LCD_1_46
+          - BOARD_TYPE_ESP32S3_Touch_LCD_3_5
+          - BOARD_TYPE_TUDOUZI
+          - BOARD_TYPE_LILYGO_T_CIRCLE_S3
+          - BOARD_TYPE_LILYGO_T_CAMERAPLUS_S3
+          - BOARD_TYPE_MOVECALL_MOJI_ESP32S3
+          - BOARD_TYPE_MOVECALL_CUICAN_ESP32S3
+          - BOARD_TYPE_ATK_DNESP32S3
+          - BOARD_TYPE_ATK_DNESP32S3_BOX
+          - BOARD_TYPE_DU_CHATX
+          - BOARD_TYPE_ESP32S3_Taiji_Pi
+          - BOARD_TYPE_XINGZHI_Cube_0_85TFT_WIFI
+          - BOARD_TYPE_XINGZHI_Cube_0_85TFT_ML307
+          - BOARD_TYPE_XINGZHI_Cube_0_96OLED_WIFI
+          - BOARD_TYPE_XINGZHI_Cube_0_96OLED_ML307
+          - BOARD_TYPE_XINGZHI_Cube_1_54TFT_WIFI
+          - BOARD_TYPE_XINGZHI_Cube_1_54TFT_ML307
+          - BOARD_TYPE_SENSECAP_WATCHER
+      CONFIG_OLED_TYPE:
+        description: 'OLED Type. BOARD_TYPE_BREAD_COMPACT_WIFI || BOARD_TYPE_BREAD_COMPACT_ML307 || BOARD_TYPE_BREAD_COMPACT_ESP32'
+        required: false
+        default: OLED_SSD1306_128X32
+        type: choice
+        options: 
+          - OLED_SSD1306_128X32
+          - OLED_SSD1306_128X64
+          - OLED_SH1106_128X64
+      CONFIG_LCD_TYPE:
+        description: 'LCD Type. BOARD_TYPE_BREAD_COMPACT_WIFI_LCD || BOARD_TYPE_BREAD_COMPACT_ESP32_LCD || BOARD_TYPE_ESP32_CGC'
+        required: false
+        default: LCD_ST7789_240X320
+        type: choice
+        options: 
+          - LCD_ST7789_240X320
+          - LCD_ST7789_240X320_NO_IPS
+          - LCD_ST7789_170X320
+          - LCD_ST7789_172X320
+          - LCD_ST7789_240X280
+          - LCD_ST7789_240X240
+          - LCD_ST7789_240X240_7PIN
+          - LCD_ST7789_240X135
+          - LCD_ST7735_128X160
+          - LCD_ST7735_128X128
+          - LCD_ST7796_320X480
+          - LCD_ST7796_320X480_NO_IPS 
+          - LCD_ILI9341_240X320
+          - LCD_ILI9341_240X320_NO_IPS
+          - LCD_GC9A01_240X240
+          - LCD_CUSTOM
+      CONFIG_DISPLAY_ESP32S3_KORVO2_V3:
+        description: 'Screen Type. BOARD_TYPE_ESP32S3_KORVO2_V3'
+        required: false
+        default: LCD_ST7789
+        type: choice
+        options: 
+          - LCD_ST7789
+          - LCD_ILI9341
+      CONFIG_USE_WECHAT_MESSAGE_STYLE:
+        description: 'Wechat style.'
+        required: false
+        default: false
+        type: boolean
+      CONFIG_USE_WAKE_WORD_DETECT:
+        description: 'Wakup word detection. IDF_TARGET_ESP32S3 && SPIRAM'
+        required: false
+        default: true
+        type: boolean
+      CONFIG_USE_REALTIME_CHAT:
+        description: 'Realtime chat. USE_AUDIO_PROCESSOR && (BOARD_TYPE_ESP_BOX_3 || BOARD_TYPE_ESP_BOX || BOARD_TYPE_LICHUANG_DEV || BOARD_TYPE_ESP32S3_KORVO2_V3)'
+        required: false
+        default: false
+        type: boolean
+
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    runs-on: self-hosted
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Build Firmware using Docker
-        run: |
-          docker build -f .firmware/Dockerfile -t firmware-builder .
-          # 运行容器，并将构建产物复制出来
-          CONTAINER_ID=$(docker create firmware-builder)
-          docker cp ${CONTAINER_ID}:/workspace/build ./build
-          docker rm ${CONTAINER_ID}
-
-      - name: Upload Firmware Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: firmware
-          path: build/*.bin
-
-      # 可选：将固件上传到第三方云存储，比如 Cloudflare R2
-      - name: Upload to Cloudflare R2
-        if: success()
-        run: |
-          curl -X PUT "https://your-r2-bucket-url/firmware.bin" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-            --data-binary "@build/firmware.bin"
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+    - name: Override sdkconfig based on input
+      run: |
+        sed -i "s/^CONFIG_CONFIG_OTA_VERSION_URL=.*/CONFIG_CONFIG_OTA_VERSION_URL=${{ github.event.inputs.CONFIG_OTA_VERSION_URL }}/" sdkconfig
+        sed -i "s/^CONFIG_LANGUAGE_.*/CONFIG_${{ github.event.inputs.CONFIG_OTA_VERSION_URL }}=y/" sdkconfig
+        sed -i "s/^CONFIG_CONNECTION_TYPE_.*/CONFIG_${{ github.event.inputs.CONFIG_CONNECTION_TYPE }}=y/" sdkconfig
+        sed -i "s/^CONFIG_WEBSOCKET_URL=.*/CONFIG_WEBSOCKET_URL=${{ github.event.inputs.CONFIG_WEBSOCKET_URL }}/" sdkconfig
+        sed -i "s/^CONFIG_WEBSOCKET_ACCESS_TOKEN:=.*/CONFIG_WEBSOCKET_ACCESS_TOKEN:=${{ github.event.inputs.CONFIG_WEBSOCKET_ACCESS_TOKEN }}/" sdkconfig
+        sed -i "s/^CONFIG_BOARD_TYPE_.*/CONFIG_${{ github.event.inputs.CONFIG_BOARD_TYPE }}=y/" sdkconfig
+        sed -i "s/^CONFIG_OLED_TYPE_.*/CONFIG_${{ github.event.inputs.CONFIG_OLED_TYPE }}=y/" sdkconfig
+        sed -i "s/^CONFIG_LCD_TYPE_.*/CONFIG_${{ github.event.inputs.CONFIG_LCD_TYPE }}=y/" sdkconfig
+        sed -i "s/^CONFIG_LCD_TYPE_.*/CONFIG_${{ github.event.inputs.CONFIG_DISPLAY_ESP32S3_KORVO2_V3 }}=y/" sdkconfig
+        sed -i "s/^CONFIG_USE_WECHAT_MESSAGE_STYLE=.*/CONFIG_USE_WECHAT_MESSAGE_STYLE=${{ github.event.inputs.CONFIG_USE_WECHAT_MESSAGE_STYLE == true && 'y' || 'n' }}/" sdkconfig
+        sed -i "s/^CONFIG_USE_WAKE_WORD_DETECT=.*/CONFIG_USE_WAKE_WORD_DETECT=${{ github.event.inputs.CONFIG_USE_WAKE_WORD_DETECT == true && 'y' || 'n' }}/" sdkconfig
+        sed -i "s/^CONFIG_USE_REALTIME_CHAT=.*/CONFIG_USE_REALTIME_CHAT=${{ github.event.inputs.CONFIG_USE_REALTIME_CHAT == true && 'y' || 'n' }}/" sdkconfig
+    - name: Generate config hash
+      run: echo "CONFIG_HASH=$(md5sum sdkconfig | cut -d ' ' -f1)" >> $GITHUB_ENV
+    - name: Build Firmware
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.3.2
+        target: esp32s3
+        path: '.'
+        command: idf.py set-target esp32s3 && idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;" build && cd ./build && esptool.py --chip esp32s3 merge_bin -o ./merge.bin @flash_args
+    - name: Rename artifact
+      run: |
+        FILE_NAME="firmware_${{ github.ref_name }}_${{ github.sha }}_${CONFIG_HASH}.bin"
+        mv build/*.bin "build/$FILE_NAME"
+    - name: Archive Firmware Files
+      uses: actions/upload-artifact@v4
+      with: 
+        name: custom
+        path: "build/*.bin"
